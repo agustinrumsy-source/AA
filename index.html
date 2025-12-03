@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EDU-HUB — Skill-Sharing Platform (HTML)</title>
+  <meta name="description" content="EDU-HUB: an accessible, affordable, community-driven skill-sharing platform (HTML version)." />
+  <style>
+    /* ---- Simple reset & tokens ---- */
+    :root{
+      --bg: #0f1724;
+      --panel: #0b1220;
+      --muted: #9aa8bd;
+      --accent: #10b981; /* emerald */
+      --card: #0b1220;
+      --glass: rgba(255,255,255,0.03);
+      --white: #ffffff;
+      --maxw: 1100px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#071025 0%, #0f1724 100%);
+      color:var(--white);
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      padding:18px;
+      display:flex; justify-content:center;
+    }
+    .wrap{width:100%; max-width:var(--maxw)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px;cursor:pointer}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:800;color:white}
+    .site-title{font-size:1.05rem;font-weight:700}
+    nav a{color:var(--muted);text-decoration:none;margin-left:12px;font-weight:600}
+    nav a.active{color:var(--accent)}
+    .actions{display:flex;align-items:center;gap:10px}
+    .btn{background:var(--accent); color: #042025; padding:10px 14px; border-radius:10px; border:none; font-weight:700; cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06); color:var(--muted)}
+    .toggle{background:transparent;border:1px solid rgba(255,255,255,0.06); padding:8px;border-radius:8px; cursor:pointer}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start;margin-bottom:18px}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); padding:20px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+    h1{margin:0 0 8px 0;font-size:clamp(1.4rem,2.6vw,2rem)}
+    .subtitle{color:var(--muted);margin:0 0 12px 0}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .stats{display:flex;gap:10px;margin-top:14px}
+    .stat{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;min-width:100px;text-align:center}
+    .stat .num{font-weight:800;color:var(--accent)}
+    .category-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+
+    /* library */
+    .searchbar{display:flex;gap:8px;align-items:center}
+    .searchbar input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--white)}
+    .chips{display:flex;gap:6px;overflow:auto;padding-bottom:6px}
+    .chip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.02);cursor:pointer;color:var(--muted);white-space:nowrap}
+    .chip.active{background:var(--accent);color:#042025;font-weight:700}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}
+    .card{background:var(--panel);border-radius:12px;padding:0;overflow:hidden;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column}
+    .card .card-top{height:120px;padding:12px;color:white;display:flex;flex-direction:column;justify-content:flex-end}
+    .card .card-body{padding:12px;flex:1;display:flex;flex-direction:column}
+    .card h3{margin:0 0 6px 0}
+    .card p{margin:0;color:var(--muted);font-size:0.95rem}
+    .card .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px;border-top:1px dashed rgba(255,255,255,0.02);padding-top:8px;font-size:0.9rem;color:var(--muted)}
+
+    /* forum */
+    .thread{display:flex;gap:12px;align-items:flex-start}
+    .avatar{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:800}
+
+    /* footer */
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:0.9rem;padding-top:12px;border-top:1px solid rgba(255,255,255,0.03)}
+
+    /* small */
+    @media (max-width:920px){
+      .hero{grid-template-columns:1fr}
+      .category-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+    }
+
+    /* dark mode alternate custom properties will be toggled via class on body */
+    .light body, .light :root{--bg:#f8fafc;--panel:#ffffff;--muted:#475569;--accent:#0ea5a0;--white:#081426}
+    /* smooth transitions */
+    .panel, .card, header, nav a, .chip {transition: all 180ms ease}
+    /* small helpers */
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app">
+    <header>
+      <div class="brand" id="homeBtn" role="button" tabindex="0" aria-label="Go to home">
+        <div class="logo" aria-hidden="true">EH</div>
+        <div>
+          <div class="site-title">EDU-HUB</div>
+          <div style="font-size:0.82rem;color:var(--muted)">Skill-sharing for SDG4</div>
+        </div>
+      </div>
+
+      <nav aria-label="Main navigation">
+        <a href="#" data-page="home" class="navlink active">Home</a>
+        <a href="#" data-page="library" class="navlink">Library</a>
+        <a href="#" data-page="forum" class="navlink">Forum</a>
+      </nav>
+
+      <div class="actions">
+        <button class="toggle" id="themeToggle" aria-pressed="false" title="Toggle light / dark">🌙</button>
+        <button class="btn ghost" id="downloadBtn">Download Pitch</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- HOME -->
+      <section id="page-home">
+        <div class="hero">
+          <div class="panel" aria-labelledby="hero-title">
+            <h1 id="hero-title">Knowledge Has No <span style="color:var(--accent)">Boundaries</span></h1>
+            <p class="subtitle">EDU-HUB is a global community connecting students with free, high-quality educational resources — peer-to-peer, mobile-first, and accessible.</p>
+
+            <div class="hero-actions">
+              <button class="btn" id="startLearningBtn">Start Learning</button>
+              <button class="btn ghost" id="contributeBtn">Contribute</button>
+            </div>
+
+            <div class="stats" role="list" aria-label="Key statistics">
+              <div class="stat" role="listitem"><div class="num">12,405</div><div class="muted">Active learners</div></div>
+              <div class="stat" role="listitem"><div class="num">8,500+</div><div class="muted">Resources</div></div>
+              <div class="stat" role="listitem"><div class="num">142</div><div class="muted">Countries</div></div>
+            </div>
+          </div>
+
+          <aside class="panel" aria-labelledby="proto">
+            <h3 id="proto">EDU-HUB Prototype</h3>
+            <p class="subtitle" style="margin-bottom:8px">From our TEAM ABNOY SDG4 pitch: accessibility, affordability, and global reach.</p>
+            <img alt="pitch preview" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='160'><rect rx='12' width='100%' height='100%' fill='%2311222b'/><text x='50%' y='50%' fill='%23fff' font-size='12' font-family='Arial' dominant-baseline='middle' text-anchor='middle'>Pitch preview</text></svg>" style="width:100%;border-radius:8px;display:block;margin-bottom:8px" />
+            <div style="text-align:center"><a href="#library" class="btn ghost" id="seeSolution">See solution summary</a></div>
+          </aside>
+        </div>
+
+        <section class="panel" style="margin-top:14px">
+          <h3 style="margin:0 0 8px 0">Featured Categories</h3>
+          <div class="category-grid" id="featuredCategories">
+            <div class="card" style="padding:12px;display:flex;gap:10px;align-items:center;cursor:pointer" data-target="library">
+              <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#60a5fa,#7c3aed);display:flex;align-items:center;justify-content:center">CS</div>
+              <div>
+                <div style="font-weight:700">Computer Science</div>
+                <div style="color:var(--muted)">120+ resources</div>
+              </div>
+            </div>
+            <div class="card" style="padding:12px;display:flex;gap:10px;align-items:center;cursor:pointer" data-target="library">
+              <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#34d399,#10b981);display:flex;align-items:center;justify-content:center">SCI</div>
+              <div><div style="font-weight:700">Natural Sciences</div><div style="color:var(--muted)">80+ resources</div></div>
+            </div>
+            <div class="card" style="padding:12px;display:flex;gap:10px;align-items:center;cursor:pointer" data-target="library">
+              <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#a78bfa,#f472b6);display:flex;align-items:center;justify-content:center">ART</div>
+              <div><div style="font-weight:700">Arts & Humanities</div><div style="color:var(--muted)">60+ resources</div></div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- LIBRARY -->
+      <section id="page-library" class="hidden">
+        <div class="panel">
+          <h2 style="margin-top:0">Resource Library</h2>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="searchbar">
+              <input id="searchInput" placeholder="Search for books, videos, papers..." aria-label="Search resources" />
+              <button class="btn ghost" id="clearSearch">Clear</button>
+            </div>
+            <div class="chips" id="categoryChips" aria-label="Categories">
+              <!-- chips populated by JS -->
+            </div>
+          </div>
+
+          <div class="grid" id="resourceGrid" aria-live="polite" style="margin-top:12px">
+            <!-- resource cards injected by JS -->
+          </div>
+
+          <div id="noResults" class="panel hidden" style="text-align:center;margin-top:12px">
+            <div style="font-size:28px;margin-bottom:8px">🔎</div>
+            <div style="font-weight:700">No results found</div>
+            <div style="color:var(--muted)">Try adjusting your search or filters.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FORUM -->
+      <section id="page-forum" class="hidden">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <h2 style="margin:0">Community Forum</h2>
+              <div style="color:var(--muted)">Ask questions, share knowledge, grow together.</div>
+            </div>
+            <div>
+              <button class="btn" id="newPostBtn">New Post</button>
+            </div>
+          </div>
+
+          <div id="forumList" style="display:flex;flex-direction:column;gap:10px">
+            <!-- threads injected by JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div>© TEAM ABNOY — EDU-HUB. Built for SDG 4: Quality Education.</div>
+      <div style="color:var(--muted);margin-top:6px">Original pitch: TEAM ABNOY_SDG4Pitch.pdf</div>
+    </footer>
+  </div>
+
+  <script>
+    /*********************
+     * Mock data (from your React version)
+     *********************/
+    const RESOURCES = [
+      { id:1, title:"Introduction to Quantum Physics", author:"Dr. A. Einstein", type:"PDF", category:"Science", downloads:1240, rating:4.8, description:"A comprehensive guide to the basics of quantum mechanics for undergraduates." },
+      { id:2, title:"Modern European History", author:"Prof. H. Zinn", type:"Video", category:"History", downloads:850, rating:4.5, description:"Lecture series covering the major political shifts in Europe from 1900-2000." },
+      { id:3, title:"Calculus I: Limits & Derivatives", author:"Math Department", type:"Worksheet", category:"Math", downloads:2100, rating:4.9, description:"Practice problems with step-by-step solutions for first-year calculus students." },
+      { id:4, title:"Python for Data Science", author:"Tech Academy", type:"Code", category:"Computer Science", downloads:3500, rating:4.7, description:"Jupyter notebooks containing real-world data analysis projects." },
+      { id:5, title:"Organic Chemistry Structures", author:"ChemLab", type:"PDF", category:"Science", downloads:900, rating:4.2, description:"Visual guides to common organic compound structures and naming conventions." },
+      { id:6, title:"Creative Writing Workshop", author:"Sarah Pen", type:"Video", category:"Arts", downloads:500, rating:4.6, description:"A 4-week workshop on character development and world-building." }
+    ];
+
+    const FORUM_POSTS = [
+      { id:1, user:"Student_99", title:"Help with Thermodynamics??", replies:12, tags:["Physics","Help"], time:"2h ago" },
+      { id:2, user:"Dev_Girl", title:"Best resources for React Hooks?", replies:24, tags:["CS","Web Dev"], time:"5h ago" },
+      { id:3, user:"HistoryBuff", title:"Discussion: Causes of WWI", replies:8, tags:["History","Debate"], time:"1d ago" }
+    ];
+
+    /*********************
+     * Simple page router
+     *********************/
+    const navlinks = document.querySelectorAll('.navlink');
+    const pages = {
+      home: document.getElementById('page-home'),
+      library: document.getElementById('page-library'),
+      forum: document.getElementById('page-forum')
+    };
+    function showPage(name) {
+      Object.keys(pages).forEach(k => pages[k].classList.add('hidden'));
+      pages[name].classList.remove('hidden');
+      navlinks.forEach(a => a.classList.toggle('active', a.dataset.page === name));
+      // focus to main for accessibility
+      pages[name].querySelector('.panel')?.focus?.();
+    }
+    navlinks.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        showPage(a.dataset.page);
+      });
+    });
+    document.getElementById('homeBtn').addEventListener('click', () => showPage('home'));
+    // initial
+    showPage('home');
+
+    /*********************
+     * Theme toggle (simple)
+     *********************/
+    const themeToggle = document.getElementById('themeToggle');
+    let lightMode = false;
+    function updateTheme() {
+      if(lightMode) {
+        document.documentElement.style.setProperty('--bg','#fafafa');
+        document.documentElement.style.setProperty('--panel','#ffffff');
+        document.documentElement.style.setProperty('--muted','#475569');
+        document.documentElement.style.setProperty('--white','#081426');
+        themeToggle.textContent = '🌞';
+        themeToggle.setAttribute('aria-pressed','true');
+      } else {
+        document.documentElement.style.setProperty('--bg','#071025');
+        document.documentElement.style.setProperty('--panel','#0b1220');
+        document.documentElement.style.setProperty('--muted','#9aa8bd');
+        document.documentElement.style.setProperty('--white','#ffffff');
+        themeToggle.textContent = '🌙';
+        themeToggle.setAttribute('aria-pressed','false');
+      }
+    }
+    themeToggle.addEventListener('click', () => {
+      lightMode = !lightMode;
+      updateTheme();
+    });
+    updateTheme();
+
+    /*********************
+     * Download Pitch
+     *********************/
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      // Update this path if you put the PDF elsewhere
+      const path = 'files/TEAM_ABNOY_SDG4Pitch.pdf';
+      window.open(path, '_blank');
+    });
+
+    /*********************
+     * Start Learning / Contribute / See solution
+     *********************/
+    document.getElementById('startLearningBtn').addEventListener('click', () => showPage('library'));
+    document.getElementById('contributeBtn').addEventListener('click', () => alert('Thanks! Contribution flow coming soon.'));
+    document.getElementById('seeSolution').addEventListener('click', () => showPage('library'));
+
+    /*********************
+     * Library: search & categories & render
+     *********************/
+    const categories = ['All','Science','Math','History','Computer Science','Arts'];
+    let activeCategory = 'All';
+    const searchInput = document.getElementById('searchInput');
+    const categoryChips = document.getElementById('categoryChips');
+    const resourceGrid = document.getElementById('resourceGrid');
+    const noResults = document.getElementById('noResults');
+    const clearSearch = document.getElementById('clearSearch');
+
+    function renderCategoryChips() {
+      categoryChips.innerHTML = '';
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'chip' + (cat === activeCategory ? ' active' : '');
+        btn.textContent = cat;
+        btn.addEventListener('click', () => {
+          activeCategory = cat;
+          renderCategoryChips();
+          renderResources();
+        });
+        categoryChips.appendChild(btn);
+      });
+    }
+
+    function renderResources() {
+      const q = (searchInput.value || '').toLowerCase().trim();
+      const filtered = RESOURCES.filter(r => {
+        const matchesSearch = r.title.toLowerCase().includes(q) || r.author.toLowerCase().includes(q);
+        const matchesCat = activeCategory === 'All' || r.category === activeCategory;
+        return matchesSearch && matchesCat;
+      });
+
+      resourceGrid.innerHTML = '';
+      if(filtered.length === 0) {
+        noResults.classList.remove('hidden');
+      } else {
+        noResults.classList.add('hidden');
+        filtered.forEach(r => {
+          const el = document.createElement('div');
+          el.className = 'card';
+          const color = r.category === 'Science' ? '#2563eb' : r.category === 'Math' ? '#ea580c' : r.category === 'Computer Science' ? '#06b6d4' : '#6b7280';
+          el.innerHTML = `
+            <div class="card-top" style="background:${color};">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="background:rgba(0,0,0,0.18);padding:6px 8px;border-radius:8px;font-size:12px">${r.category}</span>
+                <span style="background:rgba(0,0,0,0.18);padding:6px 8px;border-radius:8px;font-size:12px">${r.type}</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <h3>${r.title}</h3>
+              <p>By ${r.author}</p>
+              <p style="margin-top:8px">${r.description}</p>
+              <div class="meta">
+                <div style="display:flex;align-items:center;gap:8px"><strong style="color:var(--accent)">${r.rating}</strong> ★</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <button class="btn ghost" data-download="${r.id}">Download</button>
+                </div>
+              </div>
+            </div>
+          `;
+          resourceGrid.appendChild(el);
+        });
+      }
+    }
+
+    searchInput.addEventListener('input', () => renderResources());
+    clearSearch.addEventListener('click', () => { searchInput.value = ''; searchInput.focus(); renderResources(); });
+
+    // initial render
+    renderCategoryChips();
+    renderResources();
+
+    // handle downloads (mock)
+    resourceGrid.addEventListener('click', (e) => {
+      const dl = e.target.closest('[data-download]');
+      if(!dl) return;
+      const id = Number(dl.getAttribute('data-download'));
+      const res = RESOURCES.find(r => r.id === id);
+      if(res) {
+        alert('Downloading: ' + res.title + '\\n(This is a mock download in the HTML demo.)');
+      }
+    });
+
+    /*********************
+     * Forum render
+     *********************/
+    const forumList = document.getElementById('forumList');
+    function renderForum() {
+      forumList.innerHTML = '';
+      FORUM_POSTS.forEach(post => {
+        const el = document.createElement('div');
+        el.className = 'panel';
+        el.style.display = 'flex';
+        el.style.gap = '12px';
+        el.innerHTML = `
+          <div style="min-width:56px"><div class="avatar" aria-hidden="true">${post.user[0]}</div></div>
+          <div style="flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-weight:700">${post.title}</div>
+                <div style="color:var(--muted);font-size:0.9rem;margin-top:6px">Posted by ${post.user} • ${post.time}</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-weight:700">${post.replies}</div>
+                <div style="color:var(--muted);font-size:0.9rem">replies</div>
+              </div>
+            </div>
+          </div>
+        `;
+        forumList.appendChild(el);
+      });
+    }
+    renderForum();
+
+    /*********************
+     * Small accessibility: keyboard nav for navlinks
+     *********************/
+    document.querySelectorAll('.navlink').forEach(a => {
+      a.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          a.click();
+        }
+      });
+    });
+
+    /*********************
+     * Minor extra: make featured categories clickable to go to library and filter
+     *********************/
+    document.querySelectorAll('[data-target="library"]').forEach((el, idx) => {
+      el.addEventListener('click', () => {
+        showPage('library');
+        // pick a highlighted category if idx maps
+        const map = ['Computer Science','Science','Arts'];
+        activeCategory = map[idx] || 'All';
+        renderCategoryChips();
+        renderResources();
+      });
+    });
+
+    /*********************
+     * New post button (mock)
+     *********************/
+    document.getElementById('newPostBtn').addEventListener('click', () => {
+      const title = prompt('Post title:');
+      if(title) {
+        const user = 'You';
+        FORUM_POSTS.unshift({ id: Date.now(), user, title, replies:0, tags:[], time:'just now' });
+        renderForum();
+        alert('Post created (mock).');
+      }
+    });
+
+    /*********************
+     * Helpful: allow opening PDF from same folder ('files/TEAM_ABNOY_SDG4Pitch.pdf')
+     *********************/
+    // if you host the PDF locally, ensure path exists; otherwise opens blank.
+  </script>
+</body>
+</html>
